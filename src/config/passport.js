@@ -1,6 +1,8 @@
-require("dotenv").config();
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 passport.use(
   new GoogleStrategy(
@@ -9,17 +11,43 @@ passport.use(
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: "/auth/google/callback",
     },
-    (accessToken, refreshToken, profile, done) => {
-      // Here you would find or create a user in your database
-      return done(null, profile);
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Check if user already exists
+        let user = await prisma.user.findUnique({
+          where: { googleId: profile.id },
+        });
+
+        if (!user) {
+          // Create new user if doesn't exist
+          user = await prisma.user.create({
+            data: {
+              googleId: profile.id,
+              email: profile.emails[0].value,
+              name: profile.displayName,
+            },
+          });
+        }
+
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
     }
   )
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user);
+  done(null, user.id);
 });
 
-passport.deserializeUser((obj, done) => {
-  done(null, obj);
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id } });
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
 });
+
+export default passport;

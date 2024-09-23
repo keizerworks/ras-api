@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
+import passport from "passport";
+
 const router = express.Router();
-const passport = require("passport");
 
 // Google Authentication Routes
 router.get(
@@ -12,11 +13,11 @@ router.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    res.redirect("/");
+    res.redirect("/dashboard");
   }
 );
 
-router.get("/logout", (req, res) => {
+router.get("/logout", (req, res, next) => {
   req.logout((err) => {
     if (err) {
       return next(err);
@@ -25,4 +26,4 @@ router.get("/logout", (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

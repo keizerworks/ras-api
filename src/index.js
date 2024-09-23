@@ -1,9 +1,9 @@
-const express = require("express");
-const session = require("express-session");
-const passport = require("passport");
-const dotenv = require("dotenv");
-const authRoutes = require("./routes/authRoutes");
-const indexRoutes = require("./routes/indexRoutes");
+import express from "express";
+import session from "express-session";
+import passport from "passport";
+import dotenv from "dotenv";
+import authRoutes from "./routes/authRoutes.js";
+import indexRoutes from "./routes/indexRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 
 // Passport configuration
-require("./config/passport");
+import "./config/passport.js";
 
 // Set up session and passport middleware
 app.use(
@@ -29,9 +29,9 @@ app.use(passport.session());
 app.use("/", indexRoutes);
 app.use("/", authRoutes);
 
-
 // server
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
 
