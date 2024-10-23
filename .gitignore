@@ -3,6 +3,7 @@ node_modules/
 
 # Ignore .env file
 .env
+/dist
 
 notforproduction.md
 info2.md

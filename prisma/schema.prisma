@@ -1,3 +1,9 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,11 +13,98 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  googleId  String?  @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Teacher {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  password    String
+  phoneNumber String
+  createdAt   DateTime @default(now())
+  exams       Exam[]
+
+  @@map("teachers")
+}
+
+model Student {
+  id             String            @id @default(uuid())
+  name           String
+  email          String            @unique
+  password       String
+  phoneNumber    String
+  dateOfBirth    DateTime          @db.Date
+  enrollmentDate DateTime          @default(now())
+  subscriptions  Subscription[]
+  mainsAttempts  MainsAttempt[]
+  prelimsAttempts PrelimsAttempt[]
+
+  @@map("students")
+}
+
+model Exam {
+  id                 String              @id @default(uuid())
+  title             String
+  category          String              // Mains, Prelims, Test-series
+  type              String              // Free or Paid
+  fileUrl           String?             // Optional for prelims exams
+  questionData      Json?               // Optional for mains exams
+  teacherId         String
+  duration          Int                 // Duration in minutes
+  totalMarks        Int
+  createdAt         DateTime            @default(now())
+  teacher           Teacher             @relation(fields: [teacherId], references: [id])
+  subscriptions     Subscription[]
+  mainsAttempts     MainsAttempt[]
+  prelimsAttempts   PrelimsAttempt[]
+  prelimsAnswerKey  PrelimsAnswerKey?
+
+  @@map("exams")
+}
+
+model Subscription {
+  id               String   @id @default(uuid())
+  studentId        String
+  examId           String
+  subscriptionType String   // Prelims, Mains, Prelims cum Mains, Test Series
+  subscriptionDate DateTime @default(now())
+  student          Student  @relation(fields: [studentId], references: [id])
+  exam             Exam     @relation(fields: [examId], references: [id])
+
+  @@map("subscriptions")
+}
+
+model MainsAttempt {
+  id             String   @id @default(uuid())
+  studentId      String
+  examId         String
+  answerSheetUrl String
+  score          Int
+  feedback       String
+  attemptDate    DateTime @default(now())
+  student        Student  @relation(fields: [studentId], references: [id])
+  exam           Exam     @relation(fields: [examId], references: [id])
+
+  @@map("mains_attempts")
+}
+
+model PrelimsAttempt {
+  id          String   @id @default(uuid())
+  studentId   String
+  examId      String
+  score       Int
+  accuracy    Float
+  attempts    Int
+  attemptDate DateTime @default(now())
+  student     Student  @relation(fields: [studentId], references: [id])
+  exam        Exam     @relation(fields: [examId], references: [id])
+
+  @@map("prelims_attempts")
+}
+
+model PrelimsAnswerKey {
+  id            String @id @default(uuid())
+  examId        String @unique
+  answerKeyData Json
+  exam          Exam   @relation(fields: [examId], references: [id])
+
+  @@map("prelims_answer_keys")
 }
