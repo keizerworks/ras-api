@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 export const signup = async (req: any, res: any) => {
   try {
     console.log(req.body);
-    const { name, email, password, phoneNumber } = req.body;
+    const { name, email, password, phoneNumber, dateOfBirth } = req.body;
 
     // Validate input
     if (!name || !email || !password || !phoneNumber) {
@@ -20,23 +20,24 @@ export const signup = async (req: any, res: any) => {
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
-    // Check if teacher exists
-    const existingTeacher = await prisma.teacher.findUnique({
+    // Check if student exists
+    const existingStudent = await prisma.student.findUnique({
       where: { email }
     });
 
-    if (existingTeacher) {
+    if (existingStudent) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    // Hash password and create teacher
+    // Hash password and create student
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-    const teacher = await prisma.teacher.create({
+    const student = await prisma.student.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        phoneNumber
+        phoneNumber,
+        dateOfBirth
       }
     });
 
@@ -46,15 +47,15 @@ export const signup = async (req: any, res: any) => {
       throw new Error("JWT secret is not defined in environment variables.");
     }
     const token = jwt.sign(
-      { id: teacher.id, email: teacher.email, role: 'teacher' },
+      { id: student.id, email: student.email, role: 'student' },
       process.env.JWT_SECRET,
       { expiresIn: TOKEN_EXPIRY }
     );
 
-    const { password: _, ...teacherWithoutPassword } = teacher;
+    const { password: _, ...studentWithoutPassword } = student;
     res.status(201).json({
-      message: 'Teacher registered successfully',
-      teacher: teacherWithoutPassword,
+      message: 'Student registered successfully',
+      student: studentWithoutPassword,
       token
     });
 
@@ -72,29 +73,29 @@ export const signin = async (req: any, res: any) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const teacher = await prisma.teacher.findUnique({
+    const student = await prisma.student.findUnique({
       where: { email }
     });
 
-    if (!teacher) {
+    if (!student) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const isValidPassword = await bcrypt.compare(password, teacher.password);
+    const isValidPassword = await bcrypt.compare(password, student.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const token = jwt.sign(
-      { id: teacher.id, email: teacher.email, role:'teacher' },
+      { id: student.id, email: student.email, role: 'student' },
       process.env.JWT_SECRET || "",
       { expiresIn: TOKEN_EXPIRY }
     );
 
-    const { password: _, ...teacherWithoutPassword } = teacher;
+    const { password: _, ...studentWithoutPassword } = student;
     res.json({
       message: 'Login successful',
-      teacher: teacherWithoutPassword,
+      student: studentWithoutPassword,
       token
     });
 

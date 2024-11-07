@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import teacherRoutes from './routes/teacher.routes.js';
 import examRoutes from './routes/exam.routes.js';
+import studentRoutes from './routes/student.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(express.json());
 // Routes
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/exam', examRoutes)
+app.use('/api/student', studentRoutes);
 
 // Root route
 app.get('/', (req, res) => {

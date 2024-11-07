@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -42,20 +36,22 @@ model Student {
 
 model Exam {
   id                 String              @id @default(uuid())
-  title             String
-  category          String              // Mains, Prelims, Test-series
-  type              String              // Free or Paid
-  fileUrl           String?             // Optional for prelims exams
-  questionData      Json?               // Optional for mains exams
-  teacherId         String
-  duration          Int                 // Duration in minutes
-  totalMarks        Int
-  createdAt         DateTime            @default(now())
-  teacher           Teacher             @relation(fields: [teacherId], references: [id])
-  subscriptions     Subscription[]
-  mainsAttempts     MainsAttempt[]
-  prelimsAttempts   PrelimsAttempt[]
-  prelimsAnswerKey  PrelimsAnswerKey?
+  title              String
+  category           String              // Mains, Prelims, Test-series
+  type               String              // Free or Paid
+  fileUrl            String?             // Optional for prelims exams
+  questionData       Json?               // Optional for mains exams
+  teacherId          String
+  duration           Int                 // Duration in minutes
+  totalMarks         Int
+  createdAt          DateTime            @default(now())
+  testType           TestType?            // Enum to capture type of test (Sectional, Multi-Sectional, Full-Length)
+  teacher            Teacher             @relation(fields: [teacherId], references: [id])
+  subscriptions      Subscription[]
+  mainsAttempts      MainsAttempt[]
+  prelimsAttempts    PrelimsAttempt[]
+  prelimsAnswerKey   PrelimsAnswerKey?
+  subjects           Json                @default("{}")        // Providing a default empty JSON object
 
   @@map("exams")
 }
@@ -107,4 +103,11 @@ model PrelimsAnswerKey {
   exam          Exam   @relation(fields: [examId], references: [id])
 
   @@map("prelims_answer_keys")
+}
+
+// Define the enum for the test types
+enum TestType {
+  SECTIONAL
+  MULTI_SECTIONAL
+  FULL_LENGTH
 }

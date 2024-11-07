@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const authenticateTeacher = async (req: any, res: any, next: any) => {
+const authenticateTeacher = async (req: any, res: any, next: any) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {
@@ -15,6 +15,13 @@ export const authenticateTeacher = async (req: any, res: any, next: any) => {
       throw new Error("JWT secret is not defined in environment variables.");
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+    if(!decoded.role){
+      throw new Error("JWT role not found")
+    }
+
+    if(decoded.role !== "teacher"){
+      return res.status(401).json({ error: 'Not authorized' });
+    }
 
     const teacher = await prisma.teacher.findUnique({
       where: { id: decoded.id }
@@ -35,3 +42,48 @@ export const authenticateTeacher = async (req: any, res: any, next: any) => {
     res.status(401).json({ error: 'Not authorized' });
   }
 };
+
+
+const authenticateStudent = async (req: any, res: any, next: any) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization token required' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if(!process.env.JWT_SECRET){
+      throw new Error("JWT secret is not defined in environment variables.");
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+    if(!decoded.role){
+      throw new Error("JWT role not found")
+    }
+
+    if(decoded.role !== "student"){
+      return res.status(401).json({ error: 'Not authorized' });
+    }
+
+    const student = await prisma.student.findUnique({
+      where: { id: decoded.id }
+    });
+
+    if (!student) {
+      return res.status(401).json({ error: 'Not authorized' });
+    }
+
+    req.student = {
+      id: student.id,
+      email: student.email,
+      name: student.name
+    };
+
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Not authorized' });
+  }
+};
+
+
+
+export {authenticateTeacher, authenticateStudent}

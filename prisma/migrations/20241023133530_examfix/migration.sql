@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "TestType" AS ENUM ('SECTIONAL', 'MULTI_SECTIONAL', 'FULL_LENGTH');
+
 -- CreateTable
 CREATE TABLE "teachers" (
     "id" TEXT NOT NULL,
@@ -35,6 +38,8 @@ CREATE TABLE "exams" (
     "duration" INTEGER NOT NULL,
     "totalMarks" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "testType" "TestType",
+    "subjects" JSONB NOT NULL DEFAULT '{}',
 
     CONSTRAINT "exams_pkey" PRIMARY KEY ("id")
 );
