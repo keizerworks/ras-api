@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "nodemon dist/index.js",
-    "build": "tsc",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+  "start": "tsc -b && node dist/index.js",
+  "dev": "tsc -b && nodemon dist/index.js",
+  "build": "tsc",
+  "prisma:generate": "prisma generate",
+  "prisma:migrate": "prisma migrate dev"
   },
   "keywords": [],
   "author": "",

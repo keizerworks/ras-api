@@ -202,4 +202,34 @@ export class PrelimsExamController {
       });
     }
   }
+
+  static async getFreeAndPaidPrelimsExamsInfo(req: any, res: any) {
+    const freeExams = await prisma.exam.findMany({
+      where: {
+        type: 'Free',
+        category: 'Prelims',
+      },
+      include: {
+        prelimsAnswerKey: true, // Added this line to include answer keys
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const paidExams = await prisma.exam.findMany({
+      where: {
+        type: 'Free',
+        category: 'Prelims',
+      },
+      include: {
+        prelimsAnswerKey: true, // Added this line to include answer keys
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    res.status(200).json({ freeExams, paidExams });
+  }
 }
