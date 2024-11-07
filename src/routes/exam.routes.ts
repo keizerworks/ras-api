@@ -11,13 +11,11 @@ router.get('/prelims', authenticateTeacher, PrelimsExamController.getTeacherPrel
 router.get('/prelims/:id', authenticateTeacher, PrelimsExamController.getPrelimsExamById);
 router.delete('/prelims/:id', authenticateTeacher, PrelimsExamController.deletePrelimsExam);
 
-
+router.get('/mains/free', MainsExamController.getFreeMainsExams);
 router.post('/mains', authenticateTeacher, MainsExamController.createMainsExam);
 router.get('/mains', authenticateTeacher, MainsExamController.getTeacherMainsExams);
 router.get('/mains/:id', authenticateTeacher, MainsExamController.getMainsExamById);
 router.delete("/mains/:id", authenticateTeacher, MainsExamController.deleteMainsExam);
-
-
 
 
 export default router;
