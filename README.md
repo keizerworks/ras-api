@@ -1,15 +1,34 @@
 # RAS-API
 
-A Node.js/Express REST API for managing educational exams, supporting both Prelims and Mains examination formats with secure teacher authentication and AWS S3 integration for file storage.
+A Node.js/Express REST API for managing educational exams, supporting both Prelims and Mains examination formats with secure authentication and AWS S3 integration for file storage.
 
 ## Features
 
-- **Authentication & Authorization**: Secure teacher signup/signin with JWT
-- **Exam Management**: Support for both Prelims (MCQ-based) and Mains (file-based) examinations
-- **File Handling**: AWS S3 integration for storing Mains exam documents
-- **Data Validation**: Request validation using Zod schemas
-- **Database**: Prisma ORM with structured data models
-- **Security**: Password hashing with bcrypt, protected routes
+- **Authentication & Authorization**
+  - Secure teacher and student signup/signin with JWT
+  - Role-based access control
+  - Protected routes with middleware authentication
+  
+- **Exam Management**
+  - Support for both Prelims (MCQ-based) and Mains (file-based) examinations
+  - Different exam types: Free, Paid
+  - Test types: Sectional, Multi-sectional, Full-length
+  
+- **File Handling**
+  - AWS S3 integration for storing Mains exam documents
+  - Secure file upload with type validation
+  - Automatic file naming and organization
+  
+- **Data Validation & Security**
+  - Request validation using Zod schemas
+  - Password hashing with bcrypt
+  - Input sanitization
+  - File type and size validation
+  
+- **Database**
+  - Prisma ORM with structured data models
+  - PostgreSQL database
+  - Efficient query optimization
 
 ## Prerequisites
 
@@ -18,10 +37,20 @@ A Node.js/Express REST API for managing educational exams, supporting both Preli
 - PostgreSQL database
 - npm or yarn package manager
 
-## Environment Variables
+## Setup Instructions
 
-Create a `.env` file in the root directory with the following variables:
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/ras-api.git
+cd ras-api
+```
 
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
 ```env
 PORT=3000
 JWT_SECRET=your_jwt_secret
@@ -29,12 +58,24 @@ AWS_REGION=your_aws_region
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 AWS_BUCKET_NAME=your_bucket_name
-DATABASE_URL=your_database_url
+DATABASE_URL="postgresql://username:password@localhost:5432/dbname"
+```
+
+4. Run Prisma migrations:
+```bash
+npx prisma migrate dev
+```
+
+5. Start the server:
+```bash
+npm run dev
 ```
 
 ## API Endpoints
 
-### Teacher Authentication
+### Authentication
+
+#### Teacher Routes
 
 | Method | Endpoint           | Description                | Access  |
 |--------|-------------------|----------------------------|---------|
@@ -42,28 +83,40 @@ DATABASE_URL=your_database_url
 | POST   | `/api/teacher/signin` | Teacher login            | Public  |
 | GET    | `/api/teacher/profile` | Get teacher profile      | Private |
 
-### Prelims Exam Management
+#### Student Routes
 
 | Method | Endpoint           | Description                | Access  |
 |--------|-------------------|----------------------------|---------|
-| POST   | `/api/exam/prelims` | Create new prelims exam   | Private |
-| GET    | `/api/exam/prelims` | Get all prelims exams     | Private |
-| GET    | `/api/exam/prelims/:id` | Get prelims exam by ID   | Private |
-| DELETE | `/api/exam/prelims/:id` | Delete prelims exam      | Private |
+| POST   | `/api/student/signup` | Register new student      | Public  |
+| POST   | `/api/student/signin` | Student login            | Public  |
+| GET    | `/api/student/profile` | Get student profile      | Private |
 
-### Mains Exam Management
+### Exam Management
+
+#### Prelims Exam Routes
 
 | Method | Endpoint           | Description                | Access  |
 |--------|-------------------|----------------------------|---------|
-| POST   | `/api/exam/mains` | Create new mains exam     | Private |
-| GET    | `/api/exam/mains` | Get all mains exams       | Private |
-| GET    | `/api/exam/mains/:id` | Get mains exam by ID     | Private |
-| DELETE | `/api/exam/mains/:id` | Delete mains exam        | Private |
+| POST   | `/api/exam/prelims` | Create new prelims exam   | Private (Teacher) |
+| GET    | `/api/exam/prelims` | Get all prelims exams     | Private (Teacher) |
+| GET    | `/api/exam/prelims/:id` | Get prelims exam by ID   | Private (Teacher) |
+| DELETE | `/api/exam/prelims/:id` | Delete prelims exam      | Private (Teacher) |
+| GET    | `/api/exam/prelims/free` | Get all free prelims exams | Public |
+
+#### Mains Exam Routes
+
+| Method | Endpoint           | Description                | Access  |
+|--------|-------------------|----------------------------|---------|
+| POST   | `/api/exam/mains` | Create new mains exam     | Private (Teacher) |
+| GET    | `/api/exam/mains` | Get all mains exams       | Private (Teacher) |
+| GET    | `/api/exam/mains/:id` | Get mains exam by ID     | Private (Teacher) |
+| DELETE | `/api/exam/mains/:id` | Delete mains exam        | Private (Teacher) |
 
 ## Request & Response Examples
 
-### Teacher Signup
+### Authentication
 
+#### Teacher Signup
 ```http
 POST /api/teacher/signup
 Content-Type: application/json
@@ -76,37 +129,62 @@ Content-Type: application/json
 }
 ```
 
-### Create Prelims Exam
+Response:
+```json
+{
+  "message": "Teacher registered successfully",
+  "teacher": {
+    "id": "clh2x3y4z5",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phoneNumber": "1234567890"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
 
+### Exam Management
+
+#### Create Prelims Exam
 ```http
 POST /api/exam/prelims
 Content-Type: application/json
 Authorization: Bearer <token>
 
 {
-  "title": "Sample Prelims Exam",
+  "title": "General Knowledge Test",
   "type": "Free",
+  "testType": "SECTIONAL",
   "duration": 120,
   "totalMarks": 100,
   "questionData": [
     {
-      "question": "Sample question?",
-      "answers": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "question": "What is the capital of France?",
+      "answers": ["London", "Paris", "Berlin", "Madrid"],
       "image": "optional_base64_image"
     }
-  ]
+  ],
+  "answerKeyData": [
+    {
+      "correctAnswerIndex": 1,
+      "reason": "Paris is the capital of France"
+    }
+  ],
+  "subjects": {
+    "subject": "General Knowledge",
+    "subtopics": ["Geography", "Capitals"]
+  }
 }
 ```
 
-### Create Mains Exam
-
+#### Create Mains Exam
 ```http
 POST /api/exam/mains
 Content-Type: multipart/form-data
 Authorization: Bearer <token>
 
 file: <PDF/PPT file>
-title: "Sample Mains Exam"
+title: "Advanced Economics"
 type: "Paid"
 duration: 180
 totalMarks: 100
@@ -115,25 +193,55 @@ totalMarks: 100
 ## File Upload Specifications
 
 ### Supported File Types
-- PDF (application/pdf)
-- PowerPoint (.ppt, .pptx)
+- PDF (`application/pdf`)
+- PowerPoint (`.ppt`, `.pptx`)
+  - `application/vnd.ms-powerpoint`
+  - `application/vnd.openxmlformats-officedocument.presentationml.presentation`
 
 ### File Size Limits
 - Maximum file size: 10MB
+- Minimum file size: 1KB
 
 ## Security Features
 
-- JWT-based authentication
-- Password hashing using bcrypt
-- Protected routes with middleware
-- File type validation
-- Request data validation using Zod schemas
+- **Authentication**
+  - JWT-based token authentication
+  - Token expiration and refresh mechanism
+  - Role-based authorization
+  
+- **Password Security**
+  - bcrypt password hashing
+  - Minimum password strength requirements
+  - Secure password reset flow
+  
+- **Request Validation**
+  - Zod schema validation
+  - Input sanitization
+  - File type verification
+  
+- **Route Protection**
+  - Role-based middleware
+  - Token verification
+  - Rate limiting
 
 ## Error Handling
 
-The API implements comprehensive error handling for:
-- Validation errors (400)
-- Authentication errors (401)
-- Authorization errors (403)
-- Not found errors (404)
-- Server errors (500)
+The API implements comprehensive error handling with appropriate HTTP status codes:
+
+### HTTP Status Codes
+- 200: Success
+- 201: Resource created
+- 400: Bad request / Validation error
+- 401: Unauthorized / Invalid credentials
+- 403: Forbidden / Insufficient permissions
+- 404: Resource not found
+- 429: Too many requests
+- 500: Internal server error
+
+### Error Response Format
+```json
+{
+  "error": "Error message",
+  "details": ["Additional error details if any"]
+}
+```
