@@ -20,7 +20,7 @@ const authenticateTeacher = async (req: any, res: any, next: any) => {
     }
 
     if(decoded.role !== "teacher"){
-      return res.status(401).json({ error: 'Not authorized' });
+      return res.status(401).json({ error: 'Not authorized 1' });
     }
 
     const teacher = await prisma.teacher.findUnique({
@@ -28,7 +28,7 @@ const authenticateTeacher = async (req: any, res: any, next: any) => {
     });
 
     if (!teacher) {
-      return res.status(401).json({ error: 'Not authorized' });
+      return res.status(401).json({ error: 'Not authorized 2' });
     }
 
     req.teacher = {
@@ -39,7 +39,7 @@ const authenticateTeacher = async (req: any, res: any, next: any) => {
 
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Not authorized' });
+    res.status(401).json({'Not authorized 3' : error});
   }
 };
 
