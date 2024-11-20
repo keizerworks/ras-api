@@ -13,6 +13,12 @@ A Node.js/Express REST API for managing educational exams, supporting both Preli
   - Support for both Prelims (MCQ-based) and Mains (file-based) examinations
   - Different exam types: Free, Paid
   - Test types: Sectional, Multi-sectional, Full-length
+
+- **Syllabus Management**
+  - Create, read, update and delete syllabus content
+  - Teacher-specific syllabus management
+  - Content validation and sanitization
+  - Secure access control
   
 - **File Handling**
   - AWS S3 integration for storing Mains exam documents
@@ -39,8 +45,7 @@ A Node.js/Express REST API for managing educational exams, supporting both Preli
 
 ## Setup Instructions
 
-1. Clone the repository:
-```bash
+1. Clone the repository:```bash
 git clone https://github.com/yourusername/ras-api.git
 cd ras-api
 ```
@@ -111,6 +116,18 @@ npm run dev
 | GET    | `/api/exam/mains` | Get all mains exams       | Private (Teacher) |
 | GET    | `/api/exam/mains/:id` | Get mains exam by ID     | Private (Teacher) |
 | DELETE | `/api/exam/mains/:id` | Delete mains exam        | Private (Teacher) |
+
+### Syllabus Management
+
+| Method | Endpoint           | Description                | Access  |
+|--------|-------------------|----------------------------|---------|
+| POST   | `/api/syllabus` | Create new syllabus       | Private (Teacher) |
+| GET    | `/api/syllabus` | Get all syllabuses        | Private (Teacher) |
+| GET    | `/api/syllabus/:id` | Get syllabus by ID       | Private (Teacher) |
+| GET    | `/api/syllabus/teacher/:teacherId` | Get syllabuses by teacher ID | Private (Teacher) |
+| PUT    | `/api/syllabus/:id` | Update syllabus          | Private (Teacher) |
+| DELETE | `/api/syllabus/:id` | Delete syllabus          | Private (Teacher) |
+
 
 ## Request & Response Examples
 
