@@ -32,7 +32,7 @@ export class SyllabusController {
         }
     }
 
-    static async getSyllabus(req: any, res: any) {
+    static async getSyllabusById(req: any, res: any) {
         try {
             const { id } = req.params;
 
@@ -52,7 +52,27 @@ export class SyllabusController {
         }
     }
 
-    static async updateSyllabus(req: any, res: any) {
+    static async getSyllabusByTeacherId(req: any, res: any) {
+        try {
+            const { teacherId } = req.params;
+
+            const syllabuses = await prisma.syllabus.findMany({
+                where: { teacherId }
+            });
+
+            if (!syllabuses.length) {
+                return res.status(404).json({ error: 'No syllabuses found for this teacher' });
+            }
+
+            res.json({ syllabuses });
+
+        } catch (error) {
+            console.error('Get syllabus by teacher error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    static async updateSyllabusById(req: any, res: any) {
         try {
             const { id } = req.params;
             const { title, content } = req.body;
@@ -81,7 +101,7 @@ export class SyllabusController {
         }
     }
 
-    static async deleteSyllabus(req: any, res: any) {
+    static async deleteSyllabusById(req: any, res: any) {
         try {
             const { id } = req.params;
 
