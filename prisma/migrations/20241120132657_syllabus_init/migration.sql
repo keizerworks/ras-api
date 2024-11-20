@@ -90,6 +90,17 @@ CREATE TABLE "prelims_answer_keys" (
     CONSTRAINT "prelims_answer_keys_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "syllabuses" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "teacherId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "syllabuses_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "teachers_email_key" ON "teachers"("email");
 
@@ -122,3 +133,6 @@ ALTER TABLE "prelims_attempts" ADD CONSTRAINT "prelims_attempts_examId_fkey" FOR
 
 -- AddForeignKey
 ALTER TABLE "prelims_answer_keys" ADD CONSTRAINT "prelims_answer_keys_examId_fkey" FOREIGN KEY ("examId") REFERENCES "exams"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "syllabuses" ADD CONSTRAINT "syllabuses_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "teachers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

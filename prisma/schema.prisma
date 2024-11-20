@@ -15,6 +15,7 @@ model Teacher {
   phoneNumber String
   createdAt   DateTime @default(now())
   exams       Exam[]
+  syllabuses  Syllabus[]
 
   @@map("teachers")
 }
@@ -103,6 +104,17 @@ model PrelimsAnswerKey {
   exam          Exam   @relation(fields: [examId], references: [id])
 
   @@map("prelims_answer_keys")
+}
+
+model Syllabus {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  teacherId String
+  createdAt DateTime @default(now())
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+
+  @@map("syllabuses")
 }
 
 // Define the enum for the test types

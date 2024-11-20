@@ -49,7 +49,6 @@ export const signup = async (req: any, res: any) => {
     const token = jwt.sign(
       { id: student.id, email: student.email, role: 'student' },
       process.env.JWT_SECRET,
-      { expiresIn: TOKEN_EXPIRY }
     );
 
     const { password: _, ...studentWithoutPassword } = student;
