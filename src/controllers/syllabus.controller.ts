@@ -37,7 +37,7 @@ export class SyllabusController {
             const { id } = req.params;
 
             const syllabus = await prisma.syllabus.findUnique({
-                where: { id: Number(id) }
+                where: { id }
             });
 
             if (!syllabus) {
@@ -63,7 +63,7 @@ export class SyllabusController {
             }
 
             const syllabus = await prisma.syllabus.update({
-                where: { id: Number(id) },
+                where: { id },
                 data: {
                     ...(title && { title }),
                     ...(content && { content })
@@ -86,7 +86,7 @@ export class SyllabusController {
             const { id } = req.params;
 
             await prisma.syllabus.delete({
-                where: { id: Number(id) }
+                where: { id }
             });
 
             res.json({ message: 'Syllabus deleted successfully' });
