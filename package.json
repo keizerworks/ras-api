@@ -2,10 +2,10 @@
   "name": "ras-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-  "start": "tsc -b && node dist/index.js",
-  "dev": "tsc -b && nodemon dist/index.js",
+  "start": "tsc -b && node dist/app.js",
+  "dev": "tsc -b && nodemon dist/app.js",
   "build": "tsc",
   "prisma:generate": "prisma generate",
   "prisma:migrate": "prisma migrate dev"

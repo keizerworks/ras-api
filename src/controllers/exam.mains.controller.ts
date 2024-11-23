@@ -64,7 +64,7 @@ export class MainsExamController {
     const response = await s3Client.send(command);
 
     if (response.$metadata.httpStatusCode !== 200) {
-      throw new Error("Failed to upload file to S3");
+      //throw new Error("Failed to upload file to S3");
     }
 
     return `https://rasdb.s3.ap-south-1.amazonaws.com/${fileName}`;

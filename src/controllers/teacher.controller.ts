@@ -43,7 +43,7 @@ export const signup = async (req: any, res: any) => {
     // Generate token
 
     if(!process.env.JWT_SECRET){
-      throw new Error("JWT secret is not defined in environment variables.");
+      //throw new Error("JWT secret is not defined in environment variables.");
     }
     const token = jwt.sign(
       { id: teacher.id, email: teacher.email, role: 'teacher' },
