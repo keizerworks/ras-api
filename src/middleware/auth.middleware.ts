@@ -14,6 +14,7 @@ const authenticateTeacher = async (req: any, res: any, next: any) => {
     if(!process.env.JWT_SECRET){
      //throw new Error("JWT secret is not defined in environment variables.");
     }
+    //@ts-ignore
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
     if(!decoded.role){
      //throw new Error("JWT role not found")
@@ -55,6 +56,7 @@ const authenticateStudent = async (req: any, res: any, next: any) => {
     if(!process.env.JWT_SECRET){
      //throw new Error("JWT secret is not defined in environment variables.");
     }
+    //@ts-ignore
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
     if(!decoded.role){
      //throw new Error("JWT role not found")

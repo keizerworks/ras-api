@@ -47,6 +47,7 @@ export const signup = async (req: any, res: any) => {
     }
     const token = jwt.sign(
       { id: teacher.id, email: teacher.email, role: 'teacher' },
+      //@ts-ignore
       process.env.JWT_SECRET,
       // { expiresIn: TOKEN_EXPIRY }
     );

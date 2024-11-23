@@ -9,6 +9,7 @@ export const generateToken = (id: string, role: Role): string => {
   
     return jwt.sign(
       { id, role },
+      //@ts-ignore
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );

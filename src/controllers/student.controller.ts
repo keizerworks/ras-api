@@ -48,6 +48,7 @@ export const signup = async (req: any, res: any) => {
     }
     const token = jwt.sign(
       { id: student.id, email: student.email, role: 'student' },
+      //@ts-ignore
       process.env.JWT_SECRET,
     );
 
