@@ -13,6 +13,9 @@ A Node.js/Express REST API for managing educational exams, supporting both Preli
   - Support for both Prelims (MCQ-based) and Mains (file-based) examinations
   - Different exam types: Free, Paid
   - Test types: Sectional, Multi-sectional, Full-length
+  - Automatic score tracking for Prelims exams
+  - PDF submission and evaluation for Mains exams
+  - Student engagement tracking with daily streaks
 
 - **Syllabus Management**
   - Create, read, update and delete syllabus content
@@ -107,6 +110,8 @@ npm run dev
 | GET    | `/api/exam/prelims/:id` | Get prelims exam by ID   | Private (Teacher) |
 | DELETE | `/api/exam/prelims/:id` | Delete prelims exam      | Private (Teacher) |
 | GET    | `/api/exam/prelims/free` | Get all free prelims exams | Public |
+| POST   | `/api/exam/prelims/attempt` | Submit exam attempt score | Private (Student) |
+| GET    | `/api/exam/prelims/scores` | Get student's exam scores | Private (Student) |
 
 #### Mains Exam Routes
 
@@ -116,6 +121,17 @@ npm run dev
 | GET    | `/api/exam/mains` | Get all mains exams       | Private (Teacher) |
 | GET    | `/api/exam/mains/:id` | Get mains exam by ID     | Private (Teacher) |
 | DELETE | `/api/exam/mains/:id` | Delete mains exam        | Private (Teacher) |
+| POST   | `/api/exam/mains/attempt` | Submit exam attempt     | Private (Student) |
+| GET    | `/api/exam/mains/attempts` | Get student's attempts  | Private (Student) |
+| GET    | `/api/exam/mains/pending-attempts` | Get pending evaluations | Private (Teacher) |
+| POST   | `/api/exam/mains/evaluate` | Evaluate student attempt | Private (Teacher) |
+
+#### Student Streak Routes
+
+| Method | Endpoint           | Description                | Access  |
+|--------|-------------------|----------------------------|---------|
+| POST   | `/api/exam/streak/update` | Update student's daily streak | Private (Student) |
+| GET    | `/api/exam/streak` | Get student's current streak | Private (Student) |
 
 ### Syllabus Management
 
@@ -128,27 +144,18 @@ npm run dev
 | PUT    | `/api/syllabus/:id` | Update syllabus          | Private (Teacher) |
 | DELETE | `/api/syllabus/:id` | Delete syllabus          | Private (Teacher) |
 
-### Prelims Attempt and Streak Routes
+### Request & Response Examples
 
-#### Student Prelims Attempt Routes
-
-| Method | Endpoint                   | Description                     | Access           |
-|--------|----------------------------|---------------------------------|------------------|
-| POST   | `/api/exam/prelims/attempt`| Submit prelims exam score       | Private (Student) |
-| GET    | `/api/exam/prelims/scores` | Get student's prelims exam scores | Private (Student) |
-
-#### Request & Response Examples
-
-##### Submit Prelims Score
+#### Submit Prelims Score
 ```http
 POST /api/exam/prelims/attempt
 Content-Type: application/json
 Authorization: Bearer <token>
 
 {
-  "examId": "exam_unique_id",
+  "examId": "exam-uuid",
   "score": 85,
-  "accuracy": 85.5,
+  "accuracy": 0.85,
   "attempts": 1
 }
 ```
@@ -158,69 +165,18 @@ Response:
 {
   "message": "Score submitted successfully",
   "attempt": {
-    "id": "attempt_unique_id",
-    "studentId": "student_unique_id",
-    "examId": "exam_unique_id",
+    "id": "attempt-uuid",
+    "examId": "exam-uuid",
+    "studentId": "student-uuid",
     "score": 85,
-    "accuracy": 85.5,
+    "accuracy": 0.85,
     "attempts": 1,
-    "attemptDate": "2024-01-15T10:30:00Z"
+    "attemptDate": "2024-01-01T12:00:00Z"
   }
 }
 ```
 
-##### Get Student Prelims Scores
-```http
-GET /api/exam/prelims/scores
-Authorization: Bearer <token>
-```
-
-Response:
-```json
-{
-  "attempts": [
-    {
-      "id": "attempt_unique_id",
-      "score": 85,
-      "accuracy": 85.5,
-      "attempts": 1,
-      "attemptDate": "2024-01-15T10:30:00Z",
-      "exam": {
-        "title": "General Knowledge Test",
-        "totalMarks": 100
-      }
-    }
-  ]
-}
-```
-
-#### Student Streak Routes
-
-| Method | Endpoint               | Description                     | Access           |
-|--------|------------------------|--------------------------------|------------------|
-| POST   | `/api/exam/streak/update` | Update student's daily streak  | Private (Student) |
-| GET    | `/api/exam/streak`     | Get student's current streak   | Private (Student) |
-
-#### Request & Response Examples
-
-##### Update Student Streak
-```http
-POST /api/exam/streak/update
-Authorization: Bearer <token>
-```
-
-Response:
-```json
-{
-  "streak": {
-    "studentId": "student_unique_id",
-    "streakCount": 5,
-    "lastVisit": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-##### Get Student Streak
+#### Get Student Streak
 ```http
 GET /api/exam/streak
 Authorization: Bearer <token>
@@ -230,9 +186,124 @@ Response:
 ```json
 {
   "streak": {
+    "id": "streak-uuid",
+    "studentId": "student-uuid",
     "streakCount": 5,
-    "lastVisit": "2024-01-15T10:30:00Z"
+    "lastVisit": "2024-01-01T12:00:00Z"
   }
+}
+```
+
+#### Submit Mains Attempt
+```http
+POST /api/exam/mains/attempt
+Content-Type: multipart/form-data
+Authorization: Bearer <token>
+
+file: <PDF file>
+examId: "exam-uuid"
+```
+
+Response:
+```json
+{
+  "message": "Mains exam attempt submitted successfully",
+  "attempt": {
+    "id": "attempt-uuid",
+    "examId": "exam-uuid",
+    "studentId": "student-uuid",
+    "answerSheetUrl": "https://rasdb.s3.ap-south-1.amazonaws.com/mains-attempts/answer.pdf",
+    "score": 0,
+    "feedback": "",
+    "attemptDate": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+#### Get Teacher's Pending Evaluations
+```http
+GET /api/exam/mains/pending-attempts
+Authorization: Bearer <token>
+```
+
+Response:
+```json
+{
+  "attempts": [
+    {
+      "id": "attempt-uuid",
+      "answerSheetUrl": "https://rasdb.s3.ap-south-1.amazonaws.com/mains-attempts/answer.pdf",
+      "score": 0,
+      "feedback": "",
+      "attemptDate": "2024-01-01T12:00:00Z",
+      "student": {
+        "name": "John Doe",
+        "email": "john@example.com"
+      },
+      "exam": {
+        "title": "Advanced Economics",
+        "totalMarks": 100
+      }
+    }
+  ]
+}
+```
+
+#### Evaluate Mains Attempt
+```http
+POST /api/exam/mains/evaluate
+Content-Type: multipart/form-data
+Authorization: Bearer <token>
+
+file: <PDF file with evaluation> (optional)
+attemptId: "attempt-uuid"
+score: 85
+```
+
+Response:
+```json
+{
+  "message": "Attempt evaluated successfully",
+  "attempt": {
+    "id": "attempt-uuid",
+    "answerSheetUrl": "https://rasdb.s3.ap-south-1.amazonaws.com/mains-attempts/evaluated.pdf",
+    "score": 85,
+    "feedback": "Evaluated",
+    "attemptDate": "2024-01-01T12:00:00Z",
+    "student": {
+      "name": "John Doe",
+      "email": "john@example.com"
+    },
+    "exam": {
+      "title": "Advanced Economics",
+      "totalMarks": 100
+    }
+  }
+}
+```
+
+#### Get Student's Mains Attempts
+```http
+GET /api/exam/mains/attempts
+Authorization: Bearer <token>
+```
+
+Response:
+```json
+{
+  "attempts": [
+    {
+      "id": "attempt-uuid",
+      "answerSheetUrl": "https://rasdb.s3.ap-south-1.amazonaws.com/mains-attempts/evaluated.pdf",
+      "score": 85,
+      "feedback": "Evaluated",
+      "attemptDate": "2024-01-01T12:00:00Z",
+      "exam": {
+        "title": "Advanced Economics",
+        "totalMarks": 100
+      }
+    }
+  ]
 }
 ```
 

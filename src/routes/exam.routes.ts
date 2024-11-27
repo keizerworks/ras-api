@@ -3,6 +3,7 @@ import { PrelimsExamController } from '../controllers/exam.prelims.controller';
 import { authenticateTeacher, authenticateStudent } from '../middleware/auth.middleware';
 import { MainsExamController } from '../controllers/exam.mains.controller';
 import { PrelimsAttemptController } from '../controllers/exam.prelims.attempt.controller';
+import { MainsAttemptController } from '../controllers/exam.mains.attempt.controller';
 
 const router = express.Router();
 
@@ -21,6 +22,12 @@ router.delete("/mains/:id", authenticateTeacher, MainsExamController.deleteMains
 
 router.post('/prelims/attempt', authenticateStudent, PrelimsAttemptController.submitPrelimsScore);
 router.get('/prelims/scores', authenticateStudent, PrelimsAttemptController.getStudentPrelimsScores);
+
+router.post('/mains/attempt', authenticateStudent, MainsAttemptController.submitMainsAttempt);
+router.get('/mains/attempts', authenticateStudent, MainsAttemptController.getStudentAttempts);
+router.get('/mains/pending-attempts', authenticateTeacher, MainsAttemptController.getTeacherPendingAttempts);
+router.post('/mains/evaluate', authenticateTeacher, MainsAttemptController.evaluateAttempt);
+
 router.post('/streak/update', authenticateStudent, PrelimsAttemptController.updateStudentStreak);
 router.get('/streak', authenticateStudent, PrelimsAttemptController.getStudentStreak);
 
