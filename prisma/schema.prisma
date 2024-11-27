@@ -31,6 +31,7 @@ model Student {
   subscriptions  Subscription[]
   mainsAttempts  MainsAttempt[]
   prelimsAttempts PrelimsAttempt[]
+  streak         StudentStreak?
 
   @@map("students")
 }
@@ -104,6 +105,16 @@ model PrelimsAnswerKey {
   exam          Exam   @relation(fields: [examId], references: [id])
 
   @@map("prelims_answer_keys")
+}
+
+model StudentStreak {
+  id          String   @id @default(uuid())
+  studentId   String   @unique
+  streakCount Int      @default(0)
+  lastVisit   DateTime @default(now())
+  student     Student  @relation(fields: [studentId], references: [id])
+
+  @@map("student_streaks")
 }
 
 model Syllabus {

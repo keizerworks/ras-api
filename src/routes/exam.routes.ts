@@ -2,6 +2,7 @@ import express from 'express';
 import { PrelimsExamController } from '../controllers/exam.prelims.controller';
 import { authenticateTeacher, authenticateStudent } from '../middleware/auth.middleware';
 import { MainsExamController } from '../controllers/exam.mains.controller';
+import { PrelimsAttemptController } from '../controllers/exam.prelims.attempt.controller';
 
 const router = express.Router();
 
@@ -18,5 +19,9 @@ router.get('/mains', authenticateTeacher, MainsExamController.getTeacherMainsExa
 router.get('/mains/:id', authenticateTeacher, MainsExamController.getMainsExamById);
 router.delete("/mains/:id", authenticateTeacher, MainsExamController.deleteMainsExam);
 
+router.post('/prelims/attempt', authenticateStudent, PrelimsAttemptController.submitPrelimsScore);
+router.get('/prelims/scores', authenticateStudent, PrelimsAttemptController.getStudentPrelimsScores);
+router.post('/streak/update', authenticateStudent, PrelimsAttemptController.updateStudentStreak);
+router.get('/streak', authenticateStudent, PrelimsAttemptController.getStudentStreak);
 
 export default router;

@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/teacher', teacherRoutes);
-app.use('/api/exam', examRoutes)
+app.use('/api/exam', examRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/syllabus', syllabusRoutes);
 

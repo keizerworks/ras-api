@@ -128,6 +128,122 @@ npm run dev
 | PUT    | `/api/syllabus/:id` | Update syllabus          | Private (Teacher) |
 | DELETE | `/api/syllabus/:id` | Delete syllabus          | Private (Teacher) |
 
+### Prelims Attempt and Streak Routes
+
+#### Student Prelims Attempt Routes
+
+| Method | Endpoint                   | Description                     | Access           |
+|--------|----------------------------|---------------------------------|------------------|
+| POST   | `/api/exam/prelims/attempt`| Submit prelims exam score       | Private (Student) |
+| GET    | `/api/exam/prelims/scores` | Get student's prelims exam scores | Private (Student) |
+
+#### Request & Response Examples
+
+##### Submit Prelims Score
+```http
+POST /api/exam/prelims/attempt
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "examId": "exam_unique_id",
+  "score": 85,
+  "accuracy": 85.5,
+  "attempts": 1
+}
+```
+
+Response:
+```json
+{
+  "message": "Score submitted successfully",
+  "attempt": {
+    "id": "attempt_unique_id",
+    "studentId": "student_unique_id",
+    "examId": "exam_unique_id",
+    "score": 85,
+    "accuracy": 85.5,
+    "attempts": 1,
+    "attemptDate": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+##### Get Student Prelims Scores
+```http
+GET /api/exam/prelims/scores
+Authorization: Bearer <token>
+```
+
+Response:
+```json
+{
+  "attempts": [
+    {
+      "id": "attempt_unique_id",
+      "score": 85,
+      "accuracy": 85.5,
+      "attempts": 1,
+      "attemptDate": "2024-01-15T10:30:00Z",
+      "exam": {
+        "title": "General Knowledge Test",
+        "totalMarks": 100
+      }
+    }
+  ]
+}
+```
+
+#### Student Streak Routes
+
+| Method | Endpoint               | Description                     | Access           |
+|--------|------------------------|--------------------------------|------------------|
+| POST   | `/api/exam/streak/update` | Update student's daily streak  | Private (Student) |
+| GET    | `/api/exam/streak`     | Get student's current streak   | Private (Student) |
+
+#### Request & Response Examples
+
+##### Update Student Streak
+```http
+POST /api/exam/streak/update
+Authorization: Bearer <token>
+```
+
+Response:
+```json
+{
+  "streak": {
+    "studentId": "student_unique_id",
+    "streakCount": 5,
+    "lastVisit": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+##### Get Student Streak
+```http
+GET /api/exam/streak
+Authorization: Bearer <token>
+```
+
+Response:
+```json
+{
+  "streak": {
+    "streakCount": 5,
+    "lastVisit": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+### Streak Calculation Logic
+
+The streak system works as follows:
+- Increments streak if last visit was yesterday
+- Resets to 1 if more than a day has passed since last visit
+- Maintains current streak if visited on the same day
+- Initializes streak at 1 for first-time users
+
 
 ## Request & Response Examples
 
