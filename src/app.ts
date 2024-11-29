@@ -5,6 +5,7 @@ import teacherRoutes from './routes/teacher.routes.js';
 import examRoutes from './routes/exam.routes.js';
 import studentRoutes from './routes/student.routes.js';
 import syllabusRoutes from './routes/syllabus.routes.js';
+import bodyParser from 'body-parser';
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +16,8 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/teacher', teacherRoutes);

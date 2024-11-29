@@ -8,15 +8,23 @@ export class SyllabusController {
             const { title, content } = req.body;
 
             // Validate input
-            if (!title || !content) {
-                return res.status(400).json({ error: 'Title and content are required' });
+            if (!content) {
+                return res.status(400).json({ error: 'Content is required' });
+            }
+
+            // Ensure content is a valid JSON string
+            let parsedContent;
+            try {
+                parsedContent = JSON.stringify(content); // Store the entire JSON content
+            } catch (error) {
+                return res.status(400).json({ error: 'Invalid content format' });
             }
 
             // Create syllabus in database
             const syllabus = await prisma.syllabus.create({
                 data: {
                     title,
-                    content,
+                    content: parsedContent, // Store the content as a JSON string
                     teacherId: req.teacher.id // From auth middleware
                 }
             });
@@ -78,15 +86,23 @@ export class SyllabusController {
             const { title, content } = req.body;
 
             // Validate input
-            if (!title && !content) {
-                return res.status(400).json({ error: 'Title or content is required' });
+            if (!content) {
+                return res.status(400).json({ error: 'Content is required' });
+            }
+
+            // Ensure content is a valid JSON string
+            let parsedContent;
+            try {
+                parsedContent = JSON.stringify(content); // Update the content as JSON
+            } catch (error) {
+                return res.status(400).json({ error: 'Invalid content format' });
             }
 
             const syllabus = await prisma.syllabus.update({
                 where: { id },
                 data: {
                     ...(title && { title }),
-                    ...(content && { content })
+                    content: parsedContent // Update the content as JSON
                 }
             });
 
