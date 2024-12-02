@@ -17,6 +17,13 @@ A Node.js/Express REST API for managing educational exams, supporting both Preli
   - PDF submission and evaluation for Mains exams
   - Student engagement tracking with daily streaks
 
+- **Student Features**
+  - Todo management with status tracking
+  - Daily login streak tracking
+  - Longest streak records
+  - Profile management
+  - Exam attempt history
+
 - **Syllabus Management**
   - Create, read, update and delete syllabus content
   - Teacher-specific syllabus management
@@ -143,6 +150,24 @@ npm run dev
 | GET    | `/api/syllabus/teacher/:teacherId` | Get syllabuses by teacher ID | Private (Teacher) |
 | PUT    | `/api/syllabus/:id` | Update syllabus          | Private (Teacher) |
 | DELETE | `/api/syllabus/:id` | Delete syllabus          | Private (Teacher) |
+
+### Student Management
+
+#### Todo Routes
+
+| Method | Endpoint                | Description                | Access  |
+|--------|------------------------|----------------------------|---------|
+| POST   | `/api/student/todos`   | Create new todo           | Private (Student) |
+| GET    | `/api/student/todos`   | Get all todos             | Private (Student) |
+| PUT    | `/api/student/todos/:id` | Update todo             | Private (Student) |
+| DELETE | `/api/student/todos/:id` | Delete todo             | Private (Student) |
+| PATCH  | `/api/student/todos/:id/status` | Update todo status | Private (Student) |
+
+#### Streak Routes
+
+| Method | Endpoint                | Description                | Access  |
+|--------|------------------------|----------------------------|---------|
+| GET    | `/api/student/longest-streak` | Get longest streak  | Private (Student) |
 
 ### Request & Response Examples
 
@@ -304,6 +329,76 @@ Response:
       }
     }
   ]
+}
+```
+
+#### Create Todo
+```http
+POST /api/student/todos
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "title": "Complete Physics Assignment",
+  "description": "Chapter 5 exercises",
+  "status": "PENDING",
+  "dueDate": "2024-01-10T12:00:00Z"
+}
+```
+
+Response:
+```json
+{
+  "message": "Todo created successfully",
+  "todo": {
+    "id": "todo-uuid",
+    "title": "Complete Physics Assignment",
+    "description": "Chapter 5 exercises",
+    "status": "PENDING",
+    "dueDate": "2024-01-10T12:00:00Z",
+    "createdAt": "2024-01-01T12:00:00Z",
+    "updatedAt": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+#### Update Todo Status
+```http
+PATCH /api/student/todos/todo-uuid/status
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "status": "DONE"
+}
+```
+
+Response:
+```json
+{
+  "message": "Todo status updated successfully",
+  "todo": {
+    "id": "todo-uuid",
+    "title": "Complete Physics Assignment",
+    "description": "Chapter 5 exercises",
+    "status": "DONE",
+    "dueDate": "2024-01-10T12:00:00Z",
+    "createdAt": "2024-01-01T12:00:00Z",
+    "updatedAt": "2024-01-01T12:30:00Z"
+  }
+}
+```
+
+#### Get Longest Streak
+```http
+GET /api/student/longest-streak
+Authorization: Bearer <token>
+```
+
+Response:
+```json
+{
+  "longestStreak": 15
 }
 ```
 
