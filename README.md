@@ -157,11 +157,10 @@ npm run dev
 
 | Method | Endpoint                | Description                | Access  |
 |--------|------------------------|----------------------------|---------|
-| POST   | `/api/student/todos`   | Create new todo           | Private (Student) |
-| GET    | `/api/student/todos`   | Get all todos             | Private (Student) |
-| PUT    | `/api/student/todos/:id` | Update todo             | Private (Student) |
-| DELETE | `/api/student/todos/:id` | Delete todo             | Private (Student) |
-| PATCH  | `/api/student/todos/:id/status` | Update todo status | Private (Student) |
+| POST   | `/api/student/todos/create`   | Create new todo           | Private (Student) |
+| GET    | `/api/student/todos/get`   | Get all todos             | Private (Student) |
+| PUT    | `/api/student/todos/update/:id` | Update todo             | Private (Student) |
+| DELETE | `/api/student/todos/delete/:id` | Delete todo             | Private (Student) |
 
 #### Streak Routes
 

@@ -5,6 +5,7 @@ import teacherRoutes from './routes/teacher.routes.js';
 import examRoutes from './routes/exam.routes.js';
 import studentRoutes from './routes/student.routes.js';
 import syllabusRoutes from './routes/syllabus.routes.js';
+import studentTodoRoutes from './routes/student.todo.routes.js';
 import bodyParser from 'body-parser';
 
 // Load environment variables
@@ -24,6 +25,7 @@ app.use('/api/teacher', teacherRoutes);
 app.use('/api/exam', examRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/syllabus', syllabusRoutes);
+app.use('/api/student/todos', studentTodoRoutes);
 
 // Root route
 app.get('/', (req, res) => {
